@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/products")
@@ -36,4 +37,63 @@ public class ProductController {
     }
 
     //GET SEARCH BY CODE
+    @GetMapping("/{code}")
+    public ResponseEntity<?> getProductByCode(@PathVariable String code) {
+        Optional<Product> product = service.searchByCode(code);
+        if (product.isPresent()) {
+            return ResponseEntity.ok(product.get());
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("❌ Product not found");
+    }
+
+    //GET SEARCH BY NAME
+    @GetMapping("/search")
+    public ResponseEntity<List<Product>> searchByName(@RequestParam String name) {
+        List<Product> products = service.searchByName(name);
+        return ResponseEntity.ok(products);
+    }
+
+    //PUT UPDATE STOCK
+    @PutMapping("/{code}")
+    public ResponseEntity<?> updateQuantity(@PathVariable String code, @RequestParam int quantity) {
+        try {
+            Product updated = service.updateQuantity(code, quantity);
+            return ResponseEntity.ok(updated);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("❌ " + e.getMessage());
+
+        }
+    }
+
+    //DELETE PRODUCT
+    @DeleteMapping("/{code}")
+    public ResponseEntity<?> deleteProduct(@PathVariable String code) {
+        try {
+            service.deleteProduct(code);
+            return ResponseEntity.ok("✅ Product deleted");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("❌ " + e.getMessage());
+        }
+    }
+
+    // GET LOW STOCK PRODUCTS
+    @GetMapping("/alerts/low-stock")
+    public ResponseEntity<List<Product>> getLowStockProducts() {
+        List<Product> lowStock = service.getLowStockProducts();
+        return ResponseEntity.ok(lowStock);
+    }
+
+    //GET TOTAL INVENTORY VALUE
+    @GetMapping("/report/total-value")
+    public ResponseEntity<?> getTotalInventoryValue() {
+        double total = service.getTotalInventoryValue();
+        return ResponseEntity.ok("Total Inventory Value: $" + String.format("%.2f", total));
+    }
+
+    //GET FULL REPORT
+    @GetMapping("/report")
+    public ResponseEntity<?> generateReport() {
+        String report = service.generateReport();
+        return ResponseEntity.ok(report);
+    }
 }
