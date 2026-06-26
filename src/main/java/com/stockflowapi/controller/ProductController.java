@@ -37,7 +37,7 @@ public class ProductController {
     }
 
     //GET SEARCH BY CODE
-    @GetMapping("/{code}")
+    @GetMapping("/code/{code}")
     public ResponseEntity<?> getProductByCode(@PathVariable String code) {
         Optional<Product> product = service.searchByCode(code);
         if (product.isPresent()) {
