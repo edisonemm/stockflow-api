@@ -1,0 +1,4 @@
+{
+  "buildCommand": "mvn clean package -DskipTests",
+  "startCommand": "java -jar target/*.jar"
+}
